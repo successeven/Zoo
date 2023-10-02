@@ -44,7 +44,7 @@ namespace Logic.Scene
             {
                 if (sceneContext is not ZooSceneContextView sceneContextView)
                 {
-                    log.Err("sceneContextView was null");
+                    Debug.LogError("sceneContextView was null");
                     return;
                 }
 

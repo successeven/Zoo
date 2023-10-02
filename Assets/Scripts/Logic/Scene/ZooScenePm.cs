@@ -23,11 +23,10 @@ namespace Logic.Scene
         public ZooScenePm(Ctx ctx)
         {
             _ctx = ctx;
-            //Camera.main =_ctx.sceneContextView.camera
             
             TimeStream timeStream = AddDispose(new TimeStream(new TimeStream.Ctx()));
             var animals = new ReactiveDictionary<int, AnimalInfo>();
-            var tryEat = new ReactiveEvent<EatInfo>();
+            var showLabel = new ReactiveEvent<int>();
 
             AnimalSpawnManagerPm.Ctx spawnCtx = new AnimalSpawnManagerPm.Ctx()
             {
@@ -36,15 +35,30 @@ namespace Logic.Scene
                 timeStream = timeStream,
                 zooSceneContextView = _ctx.sceneContextView,
                 animals = animals,
-                tryEat = tryEat
+                showLabel = showLabel
             };
             AddDispose(new AnimalSpawnManagerPm(spawnCtx));
 
-            FoodChainPm.Ctx foodChainCtx = new FoodChainPm.Ctx()
+            TastyShowerPm.Ctx tastyCtx = new TastyShowerPm.Ctx
             {
-                animals = animals,
-                tryEat = tryEat
+                resourceLoader = _ctx.resourceLoader,
+                poolManager = _ctx.poolManager,
+                timeStream = timeStream,
+                allAnimals = animals,
+                showLabel = showLabel,
+                PlaceForAnimalUi = _ctx.sceneContextView.PlaceForAnimalUi,
+                camera = _ctx.sceneContextView.sceneCamera
             };
+            AddDispose(new TastyShowerPm(tastyCtx));
+
+            MainUIPm.Ctx mainUiCtx = new MainUIPm.Ctx
+            {
+                resourceLoader = _ctx.resourceLoader,
+                poolManager = _ctx.poolManager,
+                PlaceForAllUi = _ctx.sceneContextView.UiParent,
+                allAnimals = animals
+            };
+            AddDispose(new MainUIPm(mainUiCtx));
         }
     }
 }

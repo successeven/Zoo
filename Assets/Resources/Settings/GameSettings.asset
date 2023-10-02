@@ -12,12 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e8b49257364a9d4790de9b2cf3ff279, type: 3}
   m_Name: GameSettings
   m_EditorClassIdentifier: 
-  MaxCountAnimals: 3
-  SpawnCooldown: 2
+  MaxCountAnimals: 30
+  SpawnCooldown: 1
   SnakeInfo:
-    Speed: 10
+    Speed: 7
   FrogInfo:
-    heightJump: 2
-    distanceJump: 3
-    Speed: 5
+    heightJump: 4
+    Speed: 3
     CooldownJump: 2

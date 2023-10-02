@@ -12,8 +12,9 @@ namespace Logic.Scene.Animals.Snake
         public struct Ctx
         {
             public BaseAnimalModel model;
-            public ReactiveEvent<EatInfo> tryEat;
+            public ReactiveEvent<BaseAnimalModel> tryEat;
             public ReactiveEvent<ChangeDirectionInfo> changeDirection;
+            public ReactiveTrigger<Vector3> reflectVelocity;
         }
 
         [SerializeField] private Transform _asset;
@@ -35,34 +36,20 @@ namespace Logic.Scene.Animals.Snake
         {
             _ctx = ctx;
         }
-        //
-        // private void OnCollisionStay(Collision other)
-        // {
-        //     if (other.gameObject.CompareTag("Wall"))
-        //         _ctx.changeDirection.Notify();
-        // }
 
         private void OnCollisionEnter(Collision other)
         {
             if (other.gameObject.CompareTag("Wall"))
             {
-                
-                var direction = other.GetContact(0).point - transform.position;
-                if (Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
-                    _ctx.changeDirection.Notify(ChangeDirectionInfo.ReverseX);
-                else
-                    _ctx.changeDirection.Notify(ChangeDirectionInfo.ReverseZ);
+                _ctx.reflectVelocity.Notify(other.GetContact(0).normal);
             }
-            else
+            else if (other.gameObject.CompareTag("Animal"))
             {
                 var otherAnimal = other.gameObject.GetComponent<AnimalView>();
                 if (otherAnimal)
                 {
-                    _ctx.tryEat.Notify(new EatInfo
-                    {
-                        AttackerId = _ctx.model.Id,
-                        DefenderId = otherAnimal.Model.Id
-                    });
+//                    Debug.Log($"{_ctx.model.AnimalName} try eat {otherAnimal.Model.AnimalName}");
+                    _ctx.tryEat.Notify(otherAnimal.Model);
                     _ctx.changeDirection.Notify(ChangeDirectionInfo.NewWay);
                 }
             }

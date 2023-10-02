@@ -33,9 +33,6 @@ namespace Logic.Loaders.ResourcesLoader
         {
             ResourcePreLoader.Ctx previewCtx = new ResourcePreLoader.Ctx
             {
-                parentLog = log,
-                maxLoadDelay = 0f,
-                minLoadDelay = 0f
             };
             _resourceLoader = new ResourcePreLoader(previewCtx);
             created?.Invoke();

@@ -93,7 +93,6 @@ namespace Logic.Scene
 			// dispose prev
 			if (_streams.TryGetValue(stream, out IDisposable curStream))
 				curStream?.Dispose();
-			log.Info($"for stream {stream.ToString()} set tps: {tps:0.0}");
 			
 			if (stream == Streams.PHYSICS)
 			{

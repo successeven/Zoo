@@ -13,9 +13,6 @@ namespace Logic.Loaders.ResourcesLoader
   {
     public struct Ctx
     {
-      public DDebug parentLog;
-      public float minLoadDelay;
-      public float maxLoadDelay;
     }
 
     private readonly Ctx _ctx;
@@ -73,13 +70,13 @@ namespace Logic.Loaders.ResourcesLoader
     {
       if (map == null)
       {
-        log.Err($"Can't get resource from nullable map by '{resourceName}'");
+        Debug.LogError($"Can't get resource from nullable map by '{resourceName}'");
         return null;
       }
       string key = resourceName;
       if (!map.TryGetValue(key, out T ret))
       {
-        log.Err($"Can't get resource '{resourceName}'");
+        Debug.LogError($"Can't get resource '{resourceName}'");
         return null;
       }
       return ret;
@@ -95,7 +92,7 @@ namespace Logic.Loaders.ResourcesLoader
         if (gameObj != null)
         {
           if (dict.ContainsKey(gameObj.name))
-            log.Info($"duplicating '{gameObj.name}' in content");
+            Debug.Log($"duplicating '{gameObj.name}' in content");
           dict[gameObj.name] = gameObj;
         }
       }

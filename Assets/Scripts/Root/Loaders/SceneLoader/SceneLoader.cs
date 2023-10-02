@@ -31,20 +31,20 @@ namespace Logic.Loaders.SceneLoader
         {
             if (_isLoading)
             {
-                log.Err($"Can't start load {sceneName}. Level loader is busy");
+                Debug.LogError($"Can't start load {sceneName}. Level loader is busy");
                 onComplete?.Invoke();
                 return;
             }
 
             _isLoading = true;
-            log.Info($"Trying to load scene {sceneName}");
+            Debug.Log($"Trying to load scene {sceneName}");
             UnityEngine.SceneManagement.Scene oldScene = SceneManager.GetActiveScene();
             LoadSceneAsync(sceneName, OnNewSceneLoaded);
 
 
             void OnNewSceneLoaded()
             {
-                log.Info($"Scene {sceneName} loaded");
+                Debug.Log($"Scene {sceneName} loaded");
                 _isLoading = false;
                 _loadingLevel?.Dispose();
                 onUnload?.Invoke();
@@ -93,7 +93,7 @@ namespace Logic.Loaders.SceneLoader
             }
             catch (Exception e)
             {
-                log.Err($"Exception in unloading scene {e}.");
+                Debug.LogError($"Exception in unloading scene {e}.");
                 onComplete?.Invoke();
             }
         }

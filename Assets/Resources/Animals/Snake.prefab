@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3756312255399228815}
   m_Layer: 0
   m_Name: Snake
-  m_TagString: Untagged
+  m_TagString: Animal
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -33,6 +33,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1334375441859468706}
+  - {fileID: 1219232942391188158}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &760718603422786227
@@ -50,7 +51,7 @@ MonoBehaviour:
   _asset: {fileID: 1334375441859468706}
   _collider: {fileID: 3756312255399228815}
   _rigidbody: {fileID: 4158490127709951216}
-  _pointForUi: {fileID: 0}
+  _pointForUi: {fileID: 1219232942391188158}
 --- !u!54 &4158490127709951216
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -184,3 +185,34 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &4514512779860596346
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1219232942391188158}
+  m_Layer: 0
+  m_Name: PlaceForUi
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1219232942391188158
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4514512779860596346}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.308, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3010798521636242742}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

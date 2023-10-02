@@ -185,6 +185,41 @@ Transform:
   m_Children: []
   m_Father: {fileID: 788114076}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &356392604
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 356392605}
+  m_Layer: 0
+  m_Name: PlacaForAnimalUi
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &356392605
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 356392604}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 533207956}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &474341666
 GameObject:
   m_ObjectHideFlags: 0
@@ -258,6 +293,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 747545951}
+  - {fileID: 356392605}
   m_Father: {fileID: 535894901}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -323,7 +359,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -359,7 +395,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainCanvas: {fileID: 533207959}
   uiParent: {fileID: 747545951}
-  camera: {fileID: 963194227}
+  sceneCamera: {fileID: 963194227}
   PlaceForAnimals: {fileID: 1291250826}
   SpawnPositions:
   - {fileID: 1466319849}
@@ -368,6 +404,7 @@ MonoBehaviour:
   - {fileID: 267090089}
   - {fileID: 1693152757}
   gameSettings: {fileID: 11400000, guid: 27526653ebde8e14eb96981b7a08e9b1, type: 2}
+  PlaceForAnimalUi: {fileID: 356392605}
 --- !u!4 &535894901
 Transform:
   m_ObjectHideFlags: 0
@@ -582,7 +619,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1824594806}
   m_LocalEulerAnglesHint: {x: 42.799, y: -211.361, z: -221.939}
 --- !u!1 &705507993
 GameObject:
@@ -676,7 +713,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1824594806}
   m_LocalEulerAnglesHint: {x: 47.88, y: -35.411, z: -8.03}
 --- !u!1 &747545950
 GameObject:
@@ -842,7 +879,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 788114075}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.7383182, y: 0.36315846, z: 0.5421538}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -852,7 +889,7 @@ Transform:
   - {fileID: 198381898}
   - {fileID: 267090089}
   - {fileID: 1693152757}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1824594806}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &828520815
 GameObject:
@@ -1828,6 +1865,9 @@ Transform:
   m_Children:
   - {fileID: 964779667}
   - {fileID: 474341667}
+  - {fileID: 705507995}
+  - {fileID: 670056232}
+  - {fileID: 788114076}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1938101337
@@ -2044,9 +2084,6 @@ MeshFilter:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 705507995}
-  - {fileID: 670056232}
   - {fileID: 535894901}
   - {fileID: 1824594806}
   - {fileID: 1291250826}
-  - {fileID: 788114076}

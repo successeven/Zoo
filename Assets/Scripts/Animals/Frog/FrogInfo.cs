@@ -6,7 +6,6 @@ namespace Animals.Frog
     public struct FrogInfo
     {
         public float heightJump;
-        public float distanceJump;
         public float Speed;
         public float CooldownJump;
     }

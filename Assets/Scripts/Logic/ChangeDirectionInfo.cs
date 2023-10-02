@@ -4,6 +4,7 @@
     {
         NewWay,
         ReverseZ,
-        ReverseX
+        ReverseX,
+        ReverseBoth
     }
 }

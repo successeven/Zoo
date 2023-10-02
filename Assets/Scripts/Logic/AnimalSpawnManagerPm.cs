@@ -21,7 +21,7 @@ namespace Logic.Loaders.View
             public ZooSceneContextView zooSceneContextView;
             public TimeStream timeStream;
             public ReactiveDictionary<int, AnimalInfo> animals;
-            public ReactiveEvent<EatInfo> tryEat;
+            public ReactiveEvent<int> showLabel;
         }
 
         private Ctx _ctx;
@@ -36,7 +36,7 @@ namespace Logic.Loaders.View
             var createAnimal = new ReactiveTrigger<CreateInfo>();
             AnimalsManagerPm.Ctx animalsManagerCtx = new AnimalsManagerPm.Ctx
             {
-                camera = _ctx.zooSceneContextView.camera,
+                camera = _ctx.zooSceneContextView.sceneCamera,
                 poolManager = _ctx.poolManager,
                 resourceLoader = _ctx.resourceLoader,
                 placeForAnimal = _ctx.zooSceneContextView.PlaceForAnimals,
@@ -44,7 +44,7 @@ namespace Logic.Loaders.View
                 timeStream = _ctx.timeStream,
                 allAnimals = _ctx.animals,
                 createAnimal = createAnimal,
-                tryEat = _ctx.tryEat
+                showLabel = _ctx.showLabel
             };
             AddDispose(new AnimalsManagerPm(animalsManagerCtx));
 

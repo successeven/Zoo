@@ -27,17 +27,33 @@ namespace Animals.Factories
             public Transform placeForAnimal;
             public ReactiveDictionary<int, AnimalInfo> allAnimals;
             public GameSettings gameSettings;
-            public ReactiveEvent<EatInfo> tryEat;
+            public ReactiveEvent<int> showLabel;
         }
 
         private Ctx _ctx;
         private Dictionary<AnimalNames, GameObject> _animalPrefs;
         private int _indexator;
+        private ReactiveTrigger<int> _death;
 
         public AnimalsManagerPm(Ctx ctx)
         {
             _ctx = ctx;
+            _death = new ReactiveTrigger<int>();
             _animalPrefs = new Dictionary<AnimalNames, GameObject>();
+            AddDispose(_death.Subscribe(Id =>
+            {
+                if (!_ctx.allAnimals.TryGetValue(Id, out var animalInfo))
+                {
+                    Debug.Log($"Dont find animal with id {Id}");
+                    return;
+                }
+                
+                animalInfo.Logic?.Dispose();
+                if (_animalPrefs.TryGetValue(animalInfo.Model.AnimalName, out var animalPref))
+                    _ctx.poolManager.Return(animalPref, animalInfo.AnimalView);
+                _ctx.allAnimals.Remove(Id);
+            }));
+            
             AddDispose(_ctx.createAnimal.Subscribe(createInfo =>
             {
                 GameObject view = LoadAndInitViewAnimal(createInfo);
@@ -47,14 +63,22 @@ namespace Animals.Factories
                         CreateFrog(view);
                         break;
                     case AnimalNames.Snake:
-                       CreateSnake(view);
+                        CreateSnake(view);
                         break;
                 }
             }));
-            
         }
-        
-        
+
+        protected override void OnDispose()
+        {
+            foreach (var animal in _ctx.allAnimals)
+            {
+                animal.Value.Logic?.Dispose();
+                if (_animalPrefs.TryGetValue(animal.Value.Model.AnimalName, out var animalPref))
+                    _ctx.poolManager.Return(animalPref, animal.Value.AnimalView);
+            }
+        }
+
 
         private void CreateSnake(GameObject view )
         {
@@ -62,6 +86,7 @@ namespace Animals.Factories
             {
                 Id = _indexator++,
                 AnimalType = AnimalType.Predator,
+                AnimalName = AnimalNames.Snake,
                 Speed = { Value = _ctx.gameSettings.SnakeInfo.Speed },
             };
             SnakePm.Ctx snakeCtx = new SnakePm.Ctx
@@ -70,7 +95,8 @@ namespace Animals.Factories
                 camera = _ctx.camera,
                 model = model,
                 view = view,
-                tryEat = _ctx.tryEat
+                death = _death,
+                showLabel = _ctx.showLabel
             };
             var snake = new SnakePm(snakeCtx);
             _ctx.allAnimals.Add(model.Id, new AnimalInfo
@@ -86,9 +112,9 @@ namespace Animals.Factories
             var model = new FrogModel()
             {
                 Id = _indexator++,
-                AnimalType = AnimalType.Predator,
+                AnimalType = AnimalType.Prey,
+                AnimalName = AnimalNames.Frog,
                 Speed = { Value = _ctx.gameSettings.FrogInfo.Speed },
-                JumpDistance = { Value = _ctx.gameSettings.FrogInfo.distanceJump},
                 JumpHeight = { Value = _ctx.gameSettings.FrogInfo.heightJump},
                 JumpCooldown = { Value = _ctx.gameSettings.FrogInfo.CooldownJump}
             };
@@ -98,7 +124,8 @@ namespace Animals.Factories
                 camera = _ctx.camera,
                 model = model,
                 view = view,
-                tryEat = _ctx.tryEat
+                death = _death,
+                showLabel = _ctx.showLabel
             };
             var frog = new FrogPm(ctx);
             _ctx.allAnimals.Add(model.Id, new AnimalInfo

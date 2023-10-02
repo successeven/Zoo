@@ -15,131 +15,92 @@ namespace Animals.Frog
         public struct Ctx
         {
             public TimeStream timeStream;
-            public ReactiveEvent<EatInfo> tryEat;
             public Camera camera;
             public GameObject view;
             public FrogModel model;
+            public ReactiveTrigger<int> death;
+            public ReactiveEvent<int> showLabel;
         }
 
         private Ctx _ctx;
         private AnimalView _view;
         private Vector3 _currentDirection;
-        private List<Vector3> _jumpPoints;
         private int _pointIndex;
         private ReactiveEvent<ChangeDirectionInfo> _changeDirectionTrigger;
-        private ReactiveProperty<bool> _onGround;
         private float _timerOnGround;
 
-        public FrogPm(Ctx ctx)
+        public FrogPm(Ctx ctx) : base(new AnimalCtx
+        {
+            model = ctx.model,
+            death = ctx.death,
+            showLabel = ctx.showLabel
+        })
         {
             _ctx = ctx;
             _view = _ctx.view.GetComponent<AnimalView>();
-            _jumpPoints = new List<Vector3>();
-            _onGround = new ReactiveProperty<bool>();
             _changeDirectionTrigger = new ReactiveEvent<ChangeDirectionInfo>();
+            var reflectVelocity = new ReactiveTrigger<Vector3>();
 
-            AddDispose(_changeDirectionTrigger.Subscribe(_ =>
+            AddDispose(_changeDirectionTrigger.Subscribe(newWay =>
             {
-                
-                
-                bool haveDirWall = true;
-                while (haveDirWall)
+                switch (newWay)
                 {
-                    _currentDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
-                    Collider[] walls = new Collider[2];
-                    if (Physics.OverlapSphereNonAlloc(_view.Rigidbody.position, _view.Collider.radius + .5f, walls,
-                            SceneLayers.WallMask) > 0)
-                    {
-                        for (int i = 0; i < walls.Length - 1; i++)
-                        {
-                            var wall = walls[i];
-                            Vector3 closestPoint = Physics.ClosestPoint(_view.Rigidbody.position, wall,
-                                wall.transform.position, wall.transform.rotation);
-                            Vector3 dirToTarget = (closestPoint - _view.Rigidbody.position).normalized;
-                            dirToTarget.y = 0;
-                            var angle = Vector3.Angle(_currentDirection, dirToTarget);
-                            log.Info(angle);
-                            
-                            Debug.DrawLine(_view.Rigidbody.position, dirToTarget * 2, Color.red, .2f);
-                            if (angle > 90f)
-                            {
-                                haveDirWall = false;
-                                break;
-                            }
-                        }
-                    }
-                    else
-                        haveDirWall = false;
+                    case ChangeDirectionInfo.NewWay:
+                        _currentDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
+                        _view.Rigidbody.velocity =  _ctx.model.JumpHeight.Value * Vector3.up + _currentDirection * _ctx.model.Speed.Value;
+                        break;
+                    case ChangeDirectionInfo.ReverseZ:
+                        _currentDirection.z *= -1;
+                        break;
+                    case ChangeDirectionInfo.ReverseX:
+                        _currentDirection.x *= -1;
+                        break;
+                    case ChangeDirectionInfo.ReverseBoth:
+                        _currentDirection.x *= -1;
+                        _currentDirection.z *= -1;
+                        break;
                 }
-
-                _pointIndex = 0;
-                Bezier.GetCurve(ref _jumpPoints, _view.Rigidbody.position,
-                    _currentDirection * _ctx.model.JumpDistance.Value, _ctx.model.JumpHeight.Value);
             }));
 
             _view.SetCtx(new AnimalView.Ctx
             {
-                tryEat = _ctx.tryEat,
+                tryEat = _tryEat,
                 changeDirection = _changeDirectionTrigger,
-                model = _ctx.model
+                model = _ctx.model,
+                reflectVelocity = reflectVelocity
             });
-            _changeDirectionTrigger.Notify(ChangeDirectionInfo.NewWay);
+
+            AddDispose(reflectVelocity.Subscribe(normalVector =>
+            {
+                _currentDirection = Vector3.Reflect(_currentDirection, normalVector);
+            }));
 
             AddDispose(_ctx.timeStream.SubscribeToStream(TimeStream.Streams.UPDATE, delta =>
             {
-                CheckGroundPos(delta);
                 CheckScreenPos();
-            }));
-
-            AddDispose(_ctx.timeStream.SubscribeToStream(TimeStream.Streams.PHYSICS, CheckGround));
-            AddDispose(_onGround.Subscribe(value =>
-            {
-                if (!value)
-                    return;
-
-                _changeDirectionTrigger.Notify(ChangeDirectionInfo.NewWay);
+                Move(delta);
             }));
         }
-
 
         private void CheckScreenPos()
         {
-            Vector3 screenPoint = _ctx.camera.WorldToViewportPoint(_view.transform.position +
-                                                                   _currentDirection *
-                                                                   _ctx.model.JumpDistance.Value);
-
+            Vector3 screenPoint = _ctx.camera.WorldToViewportPoint(_view.Rigidbody.position +_currentDirection * 2);
+        
             bool onScreen = screenPoint is { z: > 0, x: > 0 and < 1, y: > 0 and < 1 };
             if (!onScreen)
-                _changeDirectionTrigger.Notify(ChangeDirectionInfo.NewWay);
+                _changeDirectionTrigger.Notify(ChangeDirectionInfo.ReverseBoth);
         }
 
-        private void CheckGroundPos(float deltatime)
+        private void Move(float deltaTime)
         {
-            if (!_onGround.Value)
-                return;
-
-            _timerOnGround += deltatime;
-            if (_timerOnGround < _ctx.model.JumpCooldown.Value)
-                return;
-
-            _changeDirectionTrigger.Notify(ChangeDirectionInfo.NewWay);
-        }
-
-        private void CheckGround(float deltaTime)
-        {
-            if (_pointIndex < _jumpPoints.Count - 1 && _view.Rigidbody.transform.position == _jumpPoints[_pointIndex])
-                _pointIndex++;
-            else if (_pointIndex == _jumpPoints.Count - 1 &&
-                     _view.Rigidbody.transform.position == _jumpPoints[_pointIndex])
+            _view.Rigidbody.MovePosition(_view.Rigidbody.position + 
+                                         _ctx.model.Speed.Value * deltaTime * _currentDirection);
+            
+            var isGround = Physics.Raycast(_view.Rigidbody.position, Vector3.down, .15f, SceneLayers.FloorMask);
+            if (isGround)
             {
-                _onGround.Value = true;
-                return;
+                _changeDirectionTrigger.Notify(ChangeDirectionInfo.NewWay);
             }
-
-            Vector3 newPos = Vector3.MoveTowards(_view.Rigidbody.position, _jumpPoints[_pointIndex],
-                _ctx.model.Speed.Value * deltaTime);
-            _view.transform.position = newPos;
-            _onGround.Value = false;
         }
     }
 }

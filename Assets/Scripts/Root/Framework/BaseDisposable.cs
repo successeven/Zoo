@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Tools.Framework
 {
-	public abstract class BaseDisposable : BaseClass,  IDisposable
+	public abstract class BaseDisposable :  IDisposable
 	{
 		protected bool isDisposed;
 
@@ -34,7 +35,7 @@ namespace Tools.Framework
 				}
 				catch (Exception e)
 				{
-					log.Err($"Exception when disposing {GetType().Name}: {e}");
+					Debug.LogError($"Exception when disposing {GetType().Name}: {e}");
 				}
 				if (_unityObjects != null)
 					for (int index = _unityObjects.Count - 1; index >= 0; index--)

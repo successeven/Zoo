@@ -7,10 +7,6 @@ namespace Tools.Framework
 {
   public class BaseMonoBehaviour : MonoBehaviour
   {
-    private DDebug _logger;
-
-    protected DDebug Log
-      => _logger ??= new DDebug(GetType().Name);
 
     protected virtual void Awake() { }
 

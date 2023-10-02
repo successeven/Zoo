@@ -15,10 +15,11 @@ namespace Logic.Scene.Animals.Snake
         public struct Ctx
         {
             public TimeStream timeStream;
-            public ReactiveEvent<EatInfo> tryEat;
             public Camera camera;
             public GameObject view;
             public BaseAnimalModel model;
+            public ReactiveTrigger<int> death;
+            public ReactiveEvent<int> showLabel;
         }
 
         private Ctx _ctx;
@@ -27,10 +28,15 @@ namespace Logic.Scene.Animals.Snake
         
         private float _checkDistance = 2;
         
-        public SnakePm(Ctx ctx)
+        public SnakePm(Ctx ctx) : base(new AnimalCtx
+        {
+            model = ctx.model,
+            death = ctx.death,
+            showLabel = ctx.showLabel
+        })
         {
             _ctx = ctx;
-            
+            var reflectVelocity = new ReactiveTrigger<Vector3>();
             _view = _ctx.view.GetComponent<AnimalView>();
             var changeDirectionTrigger = new ReactiveEvent<ChangeDirectionInfo>();
             
@@ -52,10 +58,16 @@ namespace Logic.Scene.Animals.Snake
             
             _view.SetCtx(new AnimalView.Ctx
             {
-                tryEat = _ctx.tryEat,
+                tryEat = _tryEat,
                 changeDirection = changeDirectionTrigger,
-                model = _ctx.model
+                model = _ctx.model,
+                reflectVelocity = reflectVelocity
             });
+
+            AddDispose(reflectVelocity.Subscribe(normalVector =>
+            {
+                _currentDirection = Vector3.Reflect(_currentDirection, normalVector);
+            }));
             
             AddDispose(_ctx.timeStream.SubscribeToStream(TimeStream.Streams.UPDATE, _ =>
             {
@@ -67,7 +79,7 @@ namespace Logic.Scene.Animals.Snake
                     changeDirectionTrigger.Notify(ChangeDirectionInfo.NewWay);
             }));
             
-            AddDispose(_ctx.timeStream.SubscribeToStream(TimeStream.Streams.PHYSICS, Move));
+            AddDispose(_ctx.timeStream.SubscribeToStream(TimeStream.Streams.UPDATE, Move));
         }
 
         private void Move(float deltaTime)
