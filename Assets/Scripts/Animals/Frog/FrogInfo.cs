@@ -7,6 +7,5 @@ namespace Animals.Frog
     {
         public float heightJump;
         public float Speed;
-        public float CooldownJump;
     }
 }

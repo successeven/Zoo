@@ -54,7 +54,6 @@ namespace Logic.Scene
             MainUIPm.Ctx mainUiCtx = new MainUIPm.Ctx
             {
                 resourceLoader = _ctx.resourceLoader,
-                poolManager = _ctx.poolManager,
                 PlaceForAllUi = _ctx.sceneContextView.UiParent,
                 allAnimals = animals
             };

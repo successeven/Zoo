@@ -23,24 +23,21 @@ namespace Logic.Scene.Animals.Snake
         }
 
         private Ctx _ctx;
-        private AnimalView _view;
-        private Vector3 _currentDirection;
-        
-        private float _checkDistance = 2;
         
         public SnakePm(Ctx ctx) : base(new AnimalCtx
         {
             model = ctx.model,
             death = ctx.death,
-            showLabel = ctx.showLabel
+            showLabel = ctx.showLabel,
+            camera = ctx.camera,
+            timeStream = ctx.timeStream,
+            view = ctx.view
         })
         {
             _ctx = ctx;
             var reflectVelocity = new ReactiveTrigger<Vector3>();
-            _view = _ctx.view.GetComponent<AnimalView>();
-            var changeDirectionTrigger = new ReactiveEvent<ChangeDirectionInfo>();
             
-            AddDispose(changeDirectionTrigger.Subscribe(newWay =>
+            AddDispose(_changeDirectionTrigger.Subscribe(newWay =>
             {
                 switch (newWay)
                 {
@@ -53,13 +50,17 @@ namespace Logic.Scene.Animals.Snake
                     case ChangeDirectionInfo.ReverseX:
                         _currentDirection.x *= -1;
                         break;
+                    case ChangeDirectionInfo.ReverseBoth:
+                        _currentDirection.x *= -1;
+                        _currentDirection.z *= -1;
+                        break;
                 }
             }));
             
             _view.SetCtx(new AnimalView.Ctx
             {
                 tryEat = _tryEat,
-                changeDirection = changeDirectionTrigger,
+                changeDirection = _changeDirectionTrigger,
                 model = _ctx.model,
                 reflectVelocity = reflectVelocity
             });
@@ -68,21 +69,10 @@ namespace Logic.Scene.Animals.Snake
             {
                 _currentDirection = Vector3.Reflect(_currentDirection, normalVector);
             }));
-            
-            AddDispose(_ctx.timeStream.SubscribeToStream(TimeStream.Streams.UPDATE, _ =>
-            {
-                Vector3 screenPoint = _ctx.camera.WorldToViewportPoint(_view.transform.position + 
-                                                                       _currentDirection * _checkDistance);
-
-                bool onScreen = screenPoint is { z: > 0, x: > 0 and < 1, y: > 0 and < 1 };
-                if (!onScreen)
-                    changeDirectionTrigger.Notify(ChangeDirectionInfo.NewWay);
-            }));
-            
-            AddDispose(_ctx.timeStream.SubscribeToStream(TimeStream.Streams.UPDATE, Move));
+            _isInit = true;
         }
 
-        private void Move(float deltaTime)
+        protected override void Move(float deltaTime)
         {
             _view.Rigidbody.MovePosition(_view.Rigidbody.position + 
                                          _ctx.model.Speed.Value * deltaTime * _currentDirection);

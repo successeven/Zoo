@@ -14,7 +14,6 @@ namespace Logic.Scene
         {
             public ReactiveDictionary<int, AnimalInfo> allAnimals;
             public IResourceLoader resourceLoader;
-            public IPoolManager poolManager;
             public Transform PlaceForAllUi;
         }
 

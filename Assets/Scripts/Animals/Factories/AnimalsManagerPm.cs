@@ -116,7 +116,6 @@ namespace Animals.Factories
                 AnimalName = AnimalNames.Frog,
                 Speed = { Value = _ctx.gameSettings.FrogInfo.Speed },
                 JumpHeight = { Value = _ctx.gameSettings.FrogInfo.heightJump},
-                JumpCooldown = { Value = _ctx.gameSettings.FrogInfo.CooldownJump}
             };
             FrogPm.Ctx ctx = new FrogPm.Ctx
             {

@@ -23,22 +23,19 @@ namespace Animals.Frog
         }
 
         private Ctx _ctx;
-        private AnimalView _view;
-        private Vector3 _currentDirection;
-        private int _pointIndex;
-        private ReactiveEvent<ChangeDirectionInfo> _changeDirectionTrigger;
-        private float _timerOnGround;
 
         public FrogPm(Ctx ctx) : base(new AnimalCtx
         {
             model = ctx.model,
             death = ctx.death,
-            showLabel = ctx.showLabel
+            showLabel = ctx.showLabel,
+            camera = ctx.camera,
+            timeStream = ctx.timeStream,
+            view = ctx.view
         })
         {
             _ctx = ctx;
             _view = _ctx.view.GetComponent<AnimalView>();
-            _changeDirectionTrigger = new ReactiveEvent<ChangeDirectionInfo>();
             var reflectVelocity = new ReactiveTrigger<Vector3>();
 
             AddDispose(_changeDirectionTrigger.Subscribe(newWay =>
@@ -74,24 +71,11 @@ namespace Animals.Frog
             {
                 _currentDirection = Vector3.Reflect(_currentDirection, normalVector);
             }));
-
-            AddDispose(_ctx.timeStream.SubscribeToStream(TimeStream.Streams.UPDATE, delta =>
-            {
-                CheckScreenPos();
-                Move(delta);
-            }));
+            
+            _isInit = true;
         }
 
-        private void CheckScreenPos()
-        {
-            Vector3 screenPoint = _ctx.camera.WorldToViewportPoint(_view.Rigidbody.position +_currentDirection * 2);
-        
-            bool onScreen = screenPoint is { z: > 0, x: > 0 and < 1, y: > 0 and < 1 };
-            if (!onScreen)
-                _changeDirectionTrigger.Notify(ChangeDirectionInfo.ReverseBoth);
-        }
-
-        private void Move(float deltaTime)
+        protected override void Move(float deltaTime)
         {
             _view.Rigidbody.MovePosition(_view.Rigidbody.position + 
                                          _ctx.model.Speed.Value * deltaTime * _currentDirection);
